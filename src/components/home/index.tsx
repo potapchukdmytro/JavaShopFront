@@ -1,5 +1,6 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 interface ICategoryItem {
     id: number;
@@ -15,8 +16,7 @@ const Home = () => {
     useEffect(() => {
         axios.get<ICategoryItem[]>("http://localhost:8083/api/categories")
             .then(res => {
-                const list = res.data;
-                setCategories(list);
+                setCategories(res.data);
             });
     }, []);
     return (
@@ -24,15 +24,22 @@ const Home = () => {
             <div className="bg-gray-100">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl py-16 sm:py-24 lg:max-w-none lg:py-32">
-                        <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
-
+                        <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
+                        <div className="my-4">
+                            <Link
+                                to="categories/create"
+                                className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50"
+                            >
+                                Додати категорію
+                            </Link>
+                        </div>
                         <div className="mt-6 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
-                            {categories.map((category : ICategoryItem) => (
+                            {categories.map((category: ICategoryItem) => (
                                 <div key={category.id} className="group relative">
                                     <div
                                         className="relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
                                         <img
-                                            src={category.image}
+                                            src={"http://localhost:8083/files/" + category.image}
                                             alt={category.image}
                                             className="h-full w-full object-cover object-center"
                                         />
