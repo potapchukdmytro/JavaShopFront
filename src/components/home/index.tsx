@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from "react";
-import axios from "axios";
+import React, {useEffect} from "react";
 import {Link} from "react-router-dom";
+import {useActions} from "../../hooks/useActions";
+import {useTypedSelector} from "../../hooks/useTypedSelector";
+import {BASE_URL} from "../../http_common";
 
 interface ICategoryItem {
     id: number;
@@ -10,14 +12,24 @@ interface ICategoryItem {
 }
 
 const Home = () => {
+    const {GetCategoryList} = useActions();
+    const {list} = useTypedSelector(store => store.category);
 
-    const [categories, setCategories] = useState<ICategoryItem[]>([]);
+    const LoadCategories = async () => {
+        try {
+            await GetCategoryList();
+        } catch (error: any) {
+            console.log(error);
+        }
+    };
+    //const [categories, setCategories] = useState<ICategoryItem[]>([]);
 
     useEffect(() => {
-        axios.get<ICategoryItem[]>("http://localhost:8083/api/categories")
-            .then(res => {
-                setCategories(res.data);
-            });
+        // axios.get<ICategoryItem[]>("http://localhost:8083/api/categories")
+        //     .then(res => {
+        //         setCategories(res.data);
+        //     });
+        LoadCategories();
     }, []);
     return (
         <>
@@ -34,12 +46,12 @@ const Home = () => {
                             </Link>
                         </div>
                         <div className="mt-6 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
-                            {categories.map((category: ICategoryItem) => (
-                                <div key={category.id} className="group relative">
+                            {list.map((category: ICategoryItem) => (
+                                <div key={category.id} className="group relative mb-3">
                                     <div
-                                        className="relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
+                                        className="mt-2 relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
                                         <img
-                                            src={"http://localhost:8083/files/600_" + category.image}
+                                            src={BASE_URL + "files/600_" + category.image}
                                             alt={category.image}
                                             className="h-full w-full object-cover object-center"
                                         />

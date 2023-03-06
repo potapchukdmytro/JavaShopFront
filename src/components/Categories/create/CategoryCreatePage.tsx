@@ -1,19 +1,19 @@
 import {Link, useNavigate} from "react-router-dom";
 import React, {ChangeEvent} from "react";
-import {ICategoryCreate} from "../types";
-import axios from "axios";
-import {ErrorMessage, useFormik} from "formik";
+import {ICategoryCreate} from "../store/types";
+import {useFormik} from "formik";
 import * as Yup from 'yup';
-import {ObjectSchema, string} from "yup";
+import {string} from "yup";
+import {useActions} from "../../../hooks/useActions";
 
 const CategoryCreatePage = () => {
-
+    const {CreateCategory} = useActions();
     const navigator = useNavigate();
 
     const modelInitialValues: ICategoryCreate = {
         name: "",
         description: "",
-        base64: ""
+        file: null
     }
 
     const categoryCreateSchema = Yup.object().shape({
@@ -24,8 +24,7 @@ const CategoryCreatePage = () => {
 
     const onSubmitHandler = async (model: ICategoryCreate) => {
         try {
-            const item = axios.post("http://localhost:8083/api/categories", model);
-            console.log("Category saved");
+            const res = await CreateCategory(model);
             navigator("/");
         } catch (error: any) {
             console.log("Error", error);
@@ -37,12 +36,13 @@ const CategoryCreatePage = () => {
         const {files} = target;
         if (files) {
             const file = files[0];
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = (readFile: ProgressEvent<FileReader>) => {
-                const result = readFile.target?.result as string;
-                setFieldValue("base64", result);
-            };
+            setFieldValue("file", file);
+            // const fileReader = new FileReader();
+            // fileReader.readAsDataURL(file);
+            // fileReader.onload = (readFile: ProgressEvent<FileReader>) => {
+            //     const result = readFile.target?.result as string;
+            //     setFieldValue("base64", result);
+            // };
         }
         target.value = "";
     }
@@ -112,7 +112,7 @@ const CategoryCreatePage = () => {
                                     htmlFor="selectImage"
                                     className="inline-block w-20 overflow-hidden bg-gray-100"
                                 >
-                                    {values.base64 === "" ? (
+                                    {values.file === null ? (
                                         <svg
                                             className="h-full w-full text-gray-300"
                                             fill="currentColor"
@@ -122,7 +122,7 @@ const CategoryCreatePage = () => {
                                                 d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"/>
                                         </svg>
                                     ) : (
-                                        <img src={values.base64} alt="image"/>
+                                        <img src={URL.createObjectURL(values.file)} alt="image"/>
                                     )}
 
                                 </label>
