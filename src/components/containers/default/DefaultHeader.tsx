@@ -174,9 +174,9 @@ const DefaultHeader = () => {
                             )}
                         </Popover>
 
-                        <a href="#" className="text-base font-medium text-gray-500 hover:text-gray-900">
-                            Pricing
-                        </a>
+                        <Link to="products/create" className="text-base font-medium text-gray-500 hover:text-gray-900">
+                            Додати продукт
+                        </Link>
                         <a href="#" className="text-base font-medium text-gray-500 hover:text-gray-900">
                             Docs
                         </a>
@@ -261,7 +261,7 @@ const DefaultHeader = () => {
                     </Popover.Group>
                     <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
                         <Link to="login"
-                           className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+                              className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
                             Sign in
                         </Link>
                         <a
@@ -323,9 +323,10 @@ const DefaultHeader = () => {
                         </div>
                         <div className="space-y-6 py-6 px-5">
                             <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                                <a href="#" className="text-base font-medium text-gray-900 hover:text-gray-700">
-                                    Pricing
-                                </a>
+                                <Link to="products/create"
+                                      className="text-base font-medium text-gray-900 hover:text-gray-700">
+                                    Додати продукт
+                                </Link>
 
                                 <a href="#" className="text-base font-medium text-gray-900 hover:text-gray-700">
                                     Docs

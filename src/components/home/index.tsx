@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import {Link} from "react-router-dom";
 import {useActions} from "../../hooks/useActions";
 import {useTypedSelector} from "../../hooks/useTypedSelector";
-import {BASE_URL} from "../../http_common";
+import {APP_ENV} from "../../env";
 
 interface ICategoryItem {
     id: number;
@@ -51,7 +51,7 @@ const Home = () => {
                                     <div
                                         className="mt-2 relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
                                         <img
-                                            src={BASE_URL + "files/600_" + category.image}
+                                            src={`${APP_ENV.REMOTE_HOST_NAME}files/600_` + category.image}
                                             alt={category.image}
                                             className="h-full w-full object-cover object-center"
                                         />

@@ -1,9 +1,8 @@
 import axios from "axios";
-
-export const BASE_URL: string = "http://localhost:8083/";
+import {APP_ENV} from "./env";
 
 const http = axios.create({
-    baseURL: BASE_URL,
+    baseURL: APP_ENV.REMOTE_HOST_NAME,
     headers: {
         "Content-type": "application/json"
     }
