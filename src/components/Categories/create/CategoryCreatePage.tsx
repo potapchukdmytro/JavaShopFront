@@ -37,12 +37,6 @@ const CategoryCreatePage = () => {
         if (files) {
             const file = files[0];
             setFieldValue("file", file);
-            // const fileReader = new FileReader();
-            // fileReader.readAsDataURL(file);
-            // fileReader.onload = (readFile: ProgressEvent<FileReader>) => {
-            //     const result = readFile.target?.result as string;
-            //     setFieldValue("base64", result);
-            // };
         }
         target.value = "";
     }
