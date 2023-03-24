@@ -1,60 +1,85 @@
+import axios from "axios";
+import {ChangeEvent, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import React, {ChangeEvent} from "react";
-import {ICategoryCreate} from "../store/types";
-import {useFormik} from "formik";
-import * as Yup from 'yup';
-import {string} from "yup";
-import {useActions} from "../../../hooks/useActions";
+import {ICategoryCreate} from "../types";
+
+// interface IWoman {
+//   name: string,
+//   age: number,
+//   phone: string
+// }
 
 const CategoryCreatePage = () => {
-    const {CreateCategory} = useActions();
+
     const navigator = useNavigate();
 
-    const modelInitialValues: ICategoryCreate = {
+    const [model, setModel] = useState<ICategoryCreate>({
         name: "",
         description: "",
         file: null
-    }
-
-    const categoryCreateSchema = Yup.object().shape({
-        name: Yup.string().required("Обов'язкове поле"),
-        description: Yup.string(),
-        base64: string()
+        //base64: ""
     });
 
-    const onSubmitHandler = async (model: ICategoryCreate) => {
-        try {
-            const res = await CreateCategory(model);
-            navigator("/");
-        } catch (error: any) {
-            console.log("Error", error);
-        }
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        //console.log(e.target.name, e.target.value);
+        setModel({...model, [e.target.name]: e.target.value});
     }
 
     const onFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        //console.log("Select files: ", e.target.files);
         const {target} = e;
         const {files} = target;
         if (files) {
             const file = files[0];
-            setFieldValue("file", file);
+            setModel({...model, file});
+            // const fileReader = new FileReader();
+            // fileReader.readAsDataURL(file);
+            // fileReader.onload=(readFile) => {
+            //     const result = readFile.target?.result as string;
+            //     //console.log("Read File", result);
+            //     setModel({...model, "base64": result});
+            // }
         }
         target.value = "";
     }
 
-    const formik = useFormik<ICategoryCreate>({
-        initialValues: modelInitialValues,
-        validationSchema: categoryCreateSchema,
-        onSubmit: onSubmitHandler
-    });
+    const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // let woman : IWoman = {
+        //   name: "Марина",
+        //   age: 48,
+        //   phone: "+3897 874 55 44"
+        // };
+        // console.log("Woman info ", woman);
+        // woman = {...woman, age: 34};
+        // console.log("Woman new age", woman);
+        // woman = {...woman, age: 18, name: "Ілона"};
+        // console.log("Woman new age and new name", woman);
 
-    const {handleSubmit, values, handleChange, setFieldValue, errors, touched, handleBlur, isValid} = formik;
+
+        try {
+            const item = await axios
+                .post("http://localhost:8083/api/categories",
+                    model,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+            console.log("Server save category", item);
+            navigator("/");
+        } catch (error: any) {
+            console.log("Щось пішло не так", error);
+        }
+
+    }
 
     return (
         <>
             <div className="p-8 rounded border border-gray-200">
                 <h1 className="font-medium text-3xl">Додати категорію</h1>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={onSubmitHandler}>
                     <div className="mt-8 grid lg:grid-cols-1 gap-4">
                         <div>
                             <label
@@ -66,16 +91,12 @@ const CategoryCreatePage = () => {
                             <input
                                 type="text"
                                 name="name"
-                                onChange={handleChange}
-                                value={values.name}
+                                onChange={onChangeHandler}
+                                value={model.name}
                                 id="name"
-                                onBlur={handleBlur}
                                 className="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
                                 placeholder="Вкажіть назву категорії"
                             />
-                            {touched.name && errors.name ? (
-                                <div className="mx-3" style={{color: "red"}}>{errors.name}</div>
-                            ) : null}
                         </div>
 
                         <div>
@@ -88,8 +109,8 @@ const CategoryCreatePage = () => {
                             <textarea
                                 id="description"
                                 name="description"
-                                onChange={handleChange}
-                                value={values.description}
+                                onChange={onChangeHandler}
+                                value={model.description}
                                 rows={4}
                                 className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="Вкажіть опис..."
@@ -106,7 +127,7 @@ const CategoryCreatePage = () => {
                                     htmlFor="selectImage"
                                     className="inline-block w-20 overflow-hidden bg-gray-100"
                                 >
-                                    {values.file === null ? (
+                                    {model.file === null ? (
                                         <svg
                                             className="h-full w-full text-gray-300"
                                             fill="currentColor"
@@ -116,9 +137,8 @@ const CategoryCreatePage = () => {
                                                 d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"/>
                                         </svg>
                                     ) : (
-                                        <img src={URL.createObjectURL(values.file)} alt="image"/>
+                                        <img src={URL.createObjectURL(model.file)}/>
                                     )}
-
                                 </label>
                                 <label
                                     htmlFor="selectImage"
@@ -127,16 +147,20 @@ const CategoryCreatePage = () => {
                         shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2
                         focus:ring-indigo-500 focus:ring-offset-2"
                                 >
-                                    Change
+                                    Обрати фото
                                 </label>
                             </div>
 
-                            <input type="file" id="selectImage" onChange={onFileHandler} className="hidden"/>
+                            <input
+                                type="file"
+                                id="selectImage"
+                                onChange={onFileHandler}
+                                className="hidden"
+                            />
                         </div>
                     </div>
                     <div className="space-x-4 mt-8">
                         <button
-                            disabled={!(formik.isValid && formik.dirty)}
                             type="submit"
                             className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50"
                         >
