@@ -1,8 +1,9 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useActions} from "../../hooks/useActions";
 import {useTypedSelector} from "../../hooks/useTypedSelector";
 import {APP_ENV} from "../../env";
+import Loader from "../common/loader";
 
 interface ICategoryItem {
     id: number;
@@ -14,6 +15,7 @@ interface ICategoryItem {
 const Home = () => {
     const {GetCategoryList} = useActions();
     const {list} = useTypedSelector(store => store.category);
+    const [loading, setLoading] = useState(false);
 
     const LoadCategories = async () => {
         try {
@@ -25,16 +27,20 @@ const Home = () => {
     //const [categories, setCategories] = useState<ICategoryItem[]>([]);
 
     useEffect(() => {
+        setLoading(true);
         // axios.get<ICategoryItem[]>("http://localhost:8083/api/categories")
         //     .then(res => {
         //         setCategories(res.data);
         //     });
+
         LoadCategories();
+        setLoading(false);
     }, []);
     return (
         <>
             <div className="bg-gray-100">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {loading ? <Loader/> :
                     <div className="mx-auto max-w-2xl py-16 sm:py-24 lg:max-w-none lg:py-32">
                         <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
                         <div className="my-4">
@@ -67,6 +73,7 @@ const Home = () => {
                             ))}
                         </div>
                     </div>
+                    }
                 </div>
             </div>
         </>
