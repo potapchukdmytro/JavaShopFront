@@ -5,8 +5,10 @@ import {APP_ENV} from "../../../env";
 import {ILogin} from "../types";
 import * as yup from "yup";
 import {useFormik} from "formik";
+import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 
 const LoginePage = () => {
+    const {executeRecaptcha} = useGoogleReCaptcha();
     const navigator = useNavigate();
 
     // const [model, setModel] = useState<ILogin>({
@@ -16,7 +18,8 @@ const LoginePage = () => {
 
     const initValues: ILogin = {
         email: "",
-        password: ""
+        password: "",
+        reCaptchaToken: ""
     };
 
     const loginSchema = yup.object({
@@ -36,6 +39,9 @@ const LoginePage = () => {
 
     const onSubmitHandler = async (values: ILogin) => {
         try {
+            if(!executeRecaptcha)
+                return;
+            values.reCaptchaToken = await executeRecaptcha();
             const data = await axios.post(`${APP_ENV.REMOTE_HOST_NAME}account/login`, values);
             console.log("Login user token", data);
             //navigator("/");
@@ -50,7 +56,7 @@ const LoginePage = () => {
         validationSchema: loginSchema
     });
 
-    const {values, errors,touched, handleSubmit, handleChange, setFieldValue} = formik;
+    const {values, errors, touched, handleSubmit, handleChange, setFieldValue} = formik;
 
     return (
         <div className="mx-auto max-w-7xl px-8">

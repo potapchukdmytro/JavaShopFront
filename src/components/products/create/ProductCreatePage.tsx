@@ -1,10 +1,10 @@
 import axios from "axios";
-import { ChangeEvent, useEffect, useState } from "react";
-import { FaTimes } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { APP_ENV } from "../../../env";
-import { ICategoryItem } from "../../home/types";
-import { IProductCreate } from "../types";
+import {ChangeEvent, useEffect, useState} from "react";
+import {FaTimes} from "react-icons/fa";
+import {Link, useNavigate} from "react-router-dom";
+import {APP_ENV} from "../../../env";
+import {ICategoryItem} from "../../home/types";
+import {IProductCreate} from "../types";
 
 const ProductCreatePage = () => {
     const navigator = useNavigate();
@@ -35,16 +35,16 @@ const ProductCreatePage = () => {
             | ChangeEvent<HTMLSelectElement>
     ) => {
         //console.log(e.target.name, e.target.value);
-        setModel({ ...model, [e.target.name]: e.target.value });
+        setModel({...model, [e.target.name]: e.target.value});
     };
 
     const onFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
         //console.log("Select files: ", e.target.files);
-        const { target } = e;
-        const { files } = target;
+        const {target} = e;
+        const {files} = target;
         if (files) {
             const file = files[0];
-            setModel({ ...model, files: [...model.files, file] });
+            setModel({...model, files: [...model.files, file]});
         }
         target.value = "";
     };
@@ -76,16 +76,16 @@ const ProductCreatePage = () => {
                     to="#"
                     onClick={(e) => {
                         e.preventDefault();
-                        setModel({ ...model, files: model.files.filter((x) => x !== file) });
+                        setModel({...model, files: model.files.filter((x) => x !== file)});
                         console.log("click delete", file);
                     }}
                 >
-                    <FaTimes className="m-2 text-3xl text-red-500" />
+                    <FaTimes className="m-2 text-3xl text-red-500"/>
                 </Link>
             </div>
 
             <div className="relative">
-                <div style={{ height: "150px" }}>
+                <div style={{height: "150px"}}>
                     <div className="picture-main">
                         <img
                             src={URL.createObjectURL(file)}
@@ -189,7 +189,8 @@ const ProductCreatePage = () => {
                             <label className="block text-sm font-medium text-gray-700">
                                 Фото
                             </label>
-                            <div className="grid lg:grid-cols-8 md:grid-cols-6 sm:grid-cols-4 grid-cols-2 items-center gap-4">
+                            <div
+                                className="grid lg:grid-cols-8 md:grid-cols-6 sm:grid-cols-4 grid-cols-2 items-center gap-4">
                                 {dataFileView}
                             </div>
 
