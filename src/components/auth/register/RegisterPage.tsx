@@ -1,57 +1,44 @@
-import axios from "axios";
-import React, {ChangeEvent, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {APP_ENV} from "../../../env";
-import {AuthUserActionType, IAuthResponse, ILogin, IUser} from "../types";
-import * as yup from "yup";
-import {useFormik} from "formik";
+import React from "react";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {useDispatch} from "react-redux";
+import {AuthUserActionType, IAuthResponse, ILogin, IRegister, IUser} from "../types";
+import * as yup from "yup";
+import axios from "axios";
+import {APP_ENV} from "../../../env";
 import jwtDecode from "jwt-decode";
+import {useFormik} from "formik";
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const {executeRecaptcha} = useGoogleReCaptcha();
     const navigator = useNavigate();
     const dispatch = useDispatch();
 
-    // const [model, setModel] = useState<ILogin>({
-    //     email: "",
-    //     password: "",
-    // });
-
-    const initValues: ILogin = {
+    const initValues: IRegister = {
         email: "",
         password: "",
+        firstname: "",
+        lastname: "",
         reCaptchaToken: ""
     };
 
-    const loginSchema = yup.object({
+    const registerSchema = yup.object({
         email: yup.string().required("Поле не може бути порожнім").email("Не вірний формат email"),
         password: yup.string().required("Поле не може бути порожнім"),
     });
 
-    // const onChangeHandler = (
-    //     e:
-    //         | ChangeEvent<HTMLInputElement>
-    //         | ChangeEvent<HTMLTextAreaElement>
-    //         | ChangeEvent<HTMLSelectElement>
-    // ) => {
-    //     //console.log(e.target.name, e.target.value);
-    //     setModel({...model, [e.target.name]: e.target.value});
-    // };
-
-    const onSubmitHandler = async (values: ILogin) => {
+    const onSubmitHandler = async (values: IRegister) => {
         try {
-            if(!executeRecaptcha)
+            if (!executeRecaptcha)
                 return;
             values.reCaptchaToken = await executeRecaptcha();
-            const resp = await axios.post<IAuthResponse>(`${APP_ENV.REMOTE_HOST_NAME}account/login`, values);
-            console.log("Login user token", resp);
+            const resp = await axios.post<IAuthResponse>(`${APP_ENV.REMOTE_HOST_NAME}account/register`, values);
+            console.log("Register user token", resp);
             const {token} = resp.data;
             localStorage.token = token;
             const user = jwtDecode(token) as IUser;
             dispatch({
-               type: AuthUserActionType.LOGIN_USER,
+                type: AuthUserActionType.LOGIN_USER,
                 payload: user
             });
             navigator("/");
@@ -63,7 +50,7 @@ const LoginPage: React.FC = () => {
     const formik = useFormik({
         initialValues: initValues,
         onSubmit: onSubmitHandler,
-        validationSchema: loginSchema
+        validationSchema: registerSchema
     });
 
     const {values, errors, touched, handleSubmit, handleChange, setFieldValue} = formik;
@@ -71,7 +58,7 @@ const LoginPage: React.FC = () => {
     return (
         <div className="mx-auto max-w-7xl px-8">
             <div className="p-8 rounded mx-auto max-w-xl">
-                <h1 className="font-medium text-3xl text-center">Вхід на сайт</h1>
+                <h1 className="font-medium text-3xl text-center">Реєстрація</h1>
 
                 <form onSubmit={handleSubmit}>
                     <div className="mt-8 grid lg:grid-cols-1 gap-4">
@@ -121,6 +108,52 @@ const LoginPage: React.FC = () => {
                             )}
                         </div>
 
+                        <div>
+                            <label
+                                htmlFor="firstname"
+                                className="text-sm text-gray-700 block mb-1 font-medium"
+                            >
+                                Ім'я
+                            </label>
+                            <input
+                                type="text"
+                                name="firstname"
+                                onChange={handleChange}
+                                value={values.firstname}
+                                id="firstname"
+                                className="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
+
+                            />
+                            {errors.firstname && touched.firstname && (
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                                    <span className="font-medium">{errors.firstname}</span>
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="lastname"
+                                className="text-sm text-gray-700 block mb-1 font-medium"
+                            >
+                                Прізвище
+                            </label>
+                            <input
+                                type="text"
+                                name="lastname"
+                                onChange={handleChange}
+                                value={values.lastname}
+                                id="lastname"
+                                className="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
+
+                            />
+                            {errors.lastname && touched.lastname && (
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                                    <span className="font-medium">{errors.lastname}</span>
+                                </p>
+                            )}
+                        </div>
+
 
                     </div>
                     <div className="space-x-4 mt-8">
@@ -128,19 +161,19 @@ const LoginPage: React.FC = () => {
                             type="submit"
                             className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50"
                         >
-                            Вхід
+                            Зареєструватися
                         </button>
                         <Link
-                            to="/register"
+                            to="/login"
                             className=""
                         >
-                            Реєстрація
+                            Є аккаунт? Увійти
                         </Link>
                     </div>
                 </form>
             </div>
         </div>
     );
-};
+}
 
-export default LoginPage;
+export default RegisterPage;
