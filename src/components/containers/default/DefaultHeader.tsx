@@ -86,6 +86,12 @@ const DefaultHeader = () => {
     const {isAuth, user} = useSelector((store: any) => store.auth as IAuthUser);
     const dispatch = useDispatch();
 
+    let isAdmin = false;
+
+    if (isAuth && user) {
+        isAdmin = user.roles.includes("admin");
+    }
+
     const LogoutUser = (e: any) => {
         e.preventDefault();
         localStorage.removeItem("token");
@@ -188,12 +194,20 @@ const DefaultHeader = () => {
                             )}
                         </Popover>
 
-                        <Link to="products/create" className="text-base font-medium text-gray-500 hover:text-gray-900">
-                            Додати продукт
+                        <Link
+                            to="/products/list"
+                            className="text-base font-medium text-gray-500 hover:text-gray-900"
+                        >
+                            Продукти
                         </Link>
-                        <a href="#" className="text-base font-medium text-gray-500 hover:text-gray-900">
-                            Docs
-                        </a>
+                        {isAdmin && (
+                            <Link
+                                to="/admin"
+                                className="text-base font-medium text-gray-500 hover:text-gray-900"
+                            >
+                                Адмін панель
+                            </Link>
+                        )}
 
                         <Popover className="relative">
                             {({open}) => (

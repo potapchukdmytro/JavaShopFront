@@ -1,23 +1,17 @@
-import axios from "axios";
-import React, {ChangeEvent, useState} from "react";
+import React from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {APP_ENV} from "../../../env";
-import {AuthUserActionType, IAuthResponse, ILogin, IUser} from "../types";
+import {IAuthResponse, ILogin, IUser} from "../types";
 import * as yup from "yup";
 import {useFormik} from "formik";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {useDispatch} from "react-redux";
-import jwtDecode from "jwt-decode";
+import {AuthUserToken} from "../actions";
+import http from "../../../http_common";
 
 const LoginPage: React.FC = () => {
     const {executeRecaptcha} = useGoogleReCaptcha();
     const navigator = useNavigate();
     const dispatch = useDispatch();
-
-    // const [model, setModel] = useState<ILogin>({
-    //     email: "",
-    //     password: "",
-    // });
 
     const initValues: ILogin = {
         email: "",
@@ -30,31 +24,16 @@ const LoginPage: React.FC = () => {
         password: yup.string().required("Поле не може бути порожнім"),
     });
 
-    // const onChangeHandler = (
-    //     e:
-    //         | ChangeEvent<HTMLInputElement>
-    //         | ChangeEvent<HTMLTextAreaElement>
-    //         | ChangeEvent<HTMLSelectElement>
-    // ) => {
-    //     //console.log(e.target.name, e.target.value);
-    //     setModel({...model, [e.target.name]: e.target.value});
-    // };
-
     const onSubmitHandler = async (values: ILogin) => {
         try {
-            if(!executeRecaptcha)
+            if (!executeRecaptcha)
                 return;
             values.reCaptchaToken = await executeRecaptcha();
-            const resp = await axios.post<IAuthResponse>(`${APP_ENV.REMOTE_HOST_NAME}account/login`, values);
-            console.log("Login user token", resp);
-            const {token} = resp.data;
-            localStorage.token = token;
-            const user = jwtDecode(token) as IUser;
-            dispatch({
-               type: AuthUserActionType.LOGIN_USER,
-                payload: user
-            });
+
+            const resp = await http.post<IAuthResponse>("account/login", values);
+            AuthUserToken(resp.data.token, dispatch);
             navigator("/");
+
         } catch (error: any) {
             console.log("Щось пішло не так", error);
         }
