@@ -7,6 +7,7 @@ import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {useDispatch} from "react-redux";
 import {AuthUserToken} from "../actions";
 import http from "../../../http_common";
+import GoogleAuth from "../google/GoogleAuth";
 
 const LoginPage: React.FC = () => {
     const {executeRecaptcha} = useGoogleReCaptcha();
@@ -102,7 +103,7 @@ const LoginPage: React.FC = () => {
 
 
                     </div>
-                    <div className="space-x-4 mt-8">
+                    <div className="mt-8 grid grid-cols-3 gap-4">
                         <button
                             type="submit"
                             className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50"
@@ -115,6 +116,7 @@ const LoginPage: React.FC = () => {
                         >
                             Реєстрація
                         </Link>
+                        <GoogleAuth/>
                     </div>
                 </form>
             </div>
