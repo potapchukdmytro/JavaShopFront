@@ -2,7 +2,7 @@ import axios from "axios";
 import {ChangeEvent, useEffect, useState} from "react";
 import {FaTimes} from "react-icons/fa";
 import {Link, useNavigate} from "react-router-dom";
-import {APP_ENV} from "../../../env";
+import http from "../../../../http_common";
 import {ICategoryItem} from "../../home/types";
 import {IProductCreate} from "../types";
 
@@ -20,8 +20,8 @@ const ProductCreatePage = () => {
     const [categories, setCategories] = useState<Array<ICategoryItem>>([]);
 
     useEffect(() => {
-        axios
-            .get<Array<ICategoryItem>>(`${APP_ENV.REMOTE_HOST_NAME}api/categories`)
+        http
+            .get<Array<ICategoryItem>>("api/categories")
             .then((resp) => {
                 console.log("resp = ", resp);
                 setCategories(resp.data);
@@ -52,8 +52,8 @@ const ProductCreatePage = () => {
     const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const item = await axios.post(
-                `${APP_ENV.REMOTE_HOST_NAME}api/products`,
+            const item = await http.post(
+                "api/products",
                 model,
                 {
                     headers: {

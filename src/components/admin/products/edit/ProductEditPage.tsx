@@ -1,10 +1,11 @@
 import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { APP_ENV } from "../../../env";
 import { ICategoryItem } from "../../home/types";
 import { IProductCreate, IProductEdit, IProductItem } from "../types";
 import { FaTimes, FaTrash } from "react-icons/fa";
+import http from "../../../../http_common";
+import {APP_ENV} from "../../../../env";
 
 const ProductEditPage = () => {
     const navigator = useNavigate();
@@ -25,15 +26,15 @@ const ProductEditPage = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        axios
-            .get<Array<ICategoryItem>>(`${APP_ENV.REMOTE_HOST_NAME}api/categories`)
+        http
+            .get<Array<ICategoryItem>>("api/categories")
             .then((resp) => {
                 console.log("resp = ", resp);
                 setCategories(resp.data);
             });
 
-        axios
-            .get<IProductItem>(`${APP_ENV.REMOTE_HOST_NAME}api/products/${id}`)
+        http
+            .get<IProductItem>("api/products/${id}")
             .then((resp) => {
                 const { files, name, price, category_id, description } = resp.data;
                 setOldImages(files);
@@ -66,8 +67,8 @@ const ProductEditPage = () => {
     const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const item = await axios.put(
-                `${APP_ENV.REMOTE_HOST_NAME}api/products/${id}`,
+            const item = await http.put(
+                "api/products/${id}",
                 model,
                 {
                     headers: {
